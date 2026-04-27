@@ -1,0 +1,62 @@
+import enum
+import uuid
+
+from sqlalchemy import Boolean, Enum, Float, ForeignKey, Integer, Numeric, String, Text
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.models.base import Base
+
+
+class LoadStatus(str, enum.Enum):
+    available = "available"
+    bidding = "bidding"
+    booked = "booked"
+    en_route_pickup = "en_route_pickup"
+    loaded = "loaded"
+    in_transit = "in_transit"
+    delivered = "delivered"
+    cancelled = "cancelled"
+
+
+class BookingMode(str, enum.Enum):
+    fixed = "fixed"
+    auction = "auction"
+
+
+class CargoType(str, enum.Enum):
+    general = "general"
+    refrigerated = "refrigerated"
+    hazardous = "hazardous"
+    livestock = "livestock"
+    construction = "construction"
+    agricultural = "agricultural"
+    electronics = "electronics"
+
+
+class Load(Base):
+    __tablename__ = "loads"
+
+    shipper_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    pickup_location: Mapped[str] = mapped_column(String(255), nullable=False)
+    pickup_latitude: Mapped[float] = mapped_column(Float, nullable=False)
+    pickup_longitude: Mapped[float] = mapped_column(Float, nullable=False)
+    dropoff_location: Mapped[str] = mapped_column(String(255), nullable=False)
+    dropoff_latitude: Mapped[float] = mapped_column(Float, nullable=False)
+    dropoff_longitude: Mapped[float] = mapped_column(Float, nullable=False)
+    corridor: Mapped[str | None] = mapped_column(String(100))
+    cargo_type: Mapped[CargoType] = mapped_column(Enum(CargoType), nullable=False)
+    weight_tonnes: Mapped[float] = mapped_column(Float, nullable=False)
+    volume_cbm: Mapped[float | None] = mapped_column(Float)
+    cargo_description: Mapped[str | None] = mapped_column(Text)
+    cargo_value_kes: Mapped[float | None] = mapped_column(Float)
+    required_truck_type: Mapped[str | None] = mapped_column(String(50))
+    price_kes: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
+    booking_mode: Mapped[BookingMode] = mapped_column(Enum(BookingMode), default=BookingMode.fixed)
+    min_bid_floor_kes: Mapped[float | None] = mapped_column(Numeric(12, 2))
+    status: Mapped[LoadStatus] = mapped_column(Enum(LoadStatus), default=LoadStatus.available)
+    pickup_deadline: Mapped[str | None] = mapped_column(String(50))
+    special_instructions: Mapped[str | None] = mapped_column(Text)
+    requires_insurance: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    shipper = relationship("User", foreign_keys=[shipper_id])
