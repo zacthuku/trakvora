@@ -26,6 +26,7 @@ class User(Base):
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
     national_id: Mapped[str | None] = mapped_column(String(50))
     profile_photo_url: Mapped[str | None] = mapped_column(String(500))
+    otp_channel: Mapped[str | None] = mapped_column(String(10), nullable=True)
     rating: Mapped[float] = mapped_column(default=0.0)
     total_trips: Mapped[int] = mapped_column(default=0)
     cancellation_count: Mapped[int] = mapped_column(default=0)

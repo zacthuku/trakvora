@@ -9,7 +9,7 @@ from app.models.user import User
 from app.schemas.shipment import ConsignmentNoteOut, LocationUpdate, ShipmentOut, ShipmentStatusUpdate
 from app.services import shipment_service
 
-router = APIRouter(prefix="/shipments", tags=["shipments"])
+router = APIRouter(tags=["shipments"])
 
 
 @router.get("/{shipment_id}", response_model=ShipmentOut)

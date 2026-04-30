@@ -9,19 +9,25 @@ from app.models.user import User, UserRole
 from app.schemas.load import LoadCreate, LoadListOut, LoadOut, LoadUpdate
 from app.services import load_service
 
-router = APIRouter(prefix="/loads", tags=["loads"])
+router = APIRouter(tags=["loads"])
 
 
 @router.get("/marketplace", response_model=LoadListOut)
 async def marketplace(
     cargo_type: str | None = Query(None),
     corridor: str | None = Query(None),
+    near_lat: float | None = Query(None, description="Filter loads whose pickup is within radius_km of this latitude"),
+    near_lon: float | None = Query(None),
+    radius_km: float | None = Query(100.0, description="Radius in km for proximity filter"),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     _: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    return await load_service.get_marketplace(cargo_type, corridor, page, page_size, db)
+    return await load_service.get_marketplace(
+        cargo_type, corridor, page, page_size, db,
+        near_lat=near_lat, near_lon=near_lon, radius_km=radius_km,
+    )
 
 
 @router.post("", response_model=LoadOut, status_code=201)

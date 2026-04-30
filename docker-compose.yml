@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:15-alpine
@@ -9,14 +7,15 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-trakvora}
       POSTGRES_DB: ${POSTGRES_DB:-trakvora}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U trakvora"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-trakvora} -d ${POSTGRES_DB:-trakvora}"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 20
+      start_period: 120s
 
   backend:
     build: ./backend
@@ -29,6 +28,8 @@ services:
       FLUTTERWAVE_SECRET_KEY: ${FLUTTERWAVE_SECRET_KEY:-}
       SMILE_IDENTITY_API_KEY: ${SMILE_IDENTITY_API_KEY:-}
       ENVIRONMENT: ${ENVIRONMENT:-development}
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
     volumes:
       - ./backend:/app
     depends_on:

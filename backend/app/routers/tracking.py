@@ -4,7 +4,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.services.notification_service import broadcast_location, register_tracking_connection, unregister_tracking_connection
 
-router = APIRouter(prefix="/ws", tags=["tracking"])
+router = APIRouter(tags=["tracking"])
 
 
 @router.websocket("/tracking/{shipment_id}")

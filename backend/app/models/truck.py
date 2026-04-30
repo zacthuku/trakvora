@@ -31,5 +31,8 @@ class Truck(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     current_latitude: Mapped[float | None] = mapped_column(Float)
     current_longitude: Mapped[float | None] = mapped_column(Float)
+    is_driver_owned: Mapped[bool] = mapped_column(Boolean, default=False)
+    assigned_driver_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("drivers.id"), nullable=True)
 
     owner = relationship("User", foreign_keys=[owner_id])
+    assigned_driver = relationship("Driver", foreign_keys=[assigned_driver_id])

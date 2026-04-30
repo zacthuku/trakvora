@@ -1,6 +1,7 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
+import { LogoIcon, LogoWordmark } from "@/components/ui/Logo";
 
 export default function Sidebar({ links, title = "trakvora" }) {
   const navigate = useNavigate();
@@ -13,11 +14,10 @@ export default function Sidebar({ links, title = "trakvora" }) {
 
   return (
     <aside className="w-64 min-h-screen bg-slate-900 flex flex-col shrink-0">
-      <div className="px-6 py-5 border-b border-slate-800">
-        <span className="font-heading font-bold text-xl text-white tracking-tight">
-          {title}
-        </span>
-      </div>
+      <Link to="/" className="px-4 py-4 border-b border-slate-800 flex items-center gap-2.5 hover:opacity-80 transition-opacity">
+        <LogoIcon size={32} variant="dark" />
+        <LogoWordmark size="xl" variant="dark" />
+      </Link>
 
       <nav className="flex-1 px-3 py-4 flex flex-col gap-1">
         {links.map(({ to, icon: Icon, label }) => (

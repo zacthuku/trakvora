@@ -14,6 +14,7 @@ class TruckCreate(BaseModel):
     model: str | None = None
     year: int | None = None
     gps_tracker_id: str | None = None
+    is_driver_owned: bool = False
 
 
 class TruckUpdate(BaseModel):
@@ -39,6 +40,8 @@ class TruckOut(BaseModel):
     year: int | None
     gps_tracker_id: str | None
     is_active: bool
+    is_driver_owned: bool
+    assigned_driver_id: uuid.UUID | None
     current_latitude: float | None
     current_longitude: float | None
     created_at: datetime

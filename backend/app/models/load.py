@@ -55,8 +55,11 @@ class Load(Base):
     booking_mode: Mapped[BookingMode] = mapped_column(Enum(BookingMode), default=BookingMode.fixed)
     min_bid_floor_kes: Mapped[float | None] = mapped_column(Numeric(12, 2))
     status: Mapped[LoadStatus] = mapped_column(Enum(LoadStatus), default=LoadStatus.available)
+    distance_km: Mapped[float | None] = mapped_column(Float)
+    pickup_date: Mapped[str | None] = mapped_column(String(20))
+    pickup_window: Mapped[str | None] = mapped_column(String(20))
     pickup_deadline: Mapped[str | None] = mapped_column(String(50))
     special_instructions: Mapped[str | None] = mapped_column(Text)
-    requires_insurance: Mapped[bool] = mapped_column(Boolean, default=False)
+    requires_insurance: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false", nullable=False)
 
     shipper = relationship("User", foreign_keys=[shipper_id])

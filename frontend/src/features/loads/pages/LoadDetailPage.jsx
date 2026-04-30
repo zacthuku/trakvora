@@ -57,14 +57,14 @@ export default function LoadDetailPage() {
       </div>
 
       <div className="card-accent p-6 mb-6">
-        <div className="flex items-start gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4 mb-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
               <MapPin className="w-3 h-3" /> Pickup
             </div>
             <div className="font-semibold text-slate-900">{load.pickup_location}</div>
           </div>
-          <div className="text-slate-300 font-bold mt-4">→</div>
+          <div className="text-slate-300 font-bold sm:mt-4">↓<span className="hidden sm:inline">→</span></div>
           <div className="flex-1">
             <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
               <MapPin className="w-3 h-3" /> Dropoff
@@ -73,7 +73,7 @@ export default function LoadDetailPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-100">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-100">
           <div>
             <div className="text-xs text-slate-500">Price</div>
             <div className="font-data-mono font-bold text-slate-900 mt-0.5">

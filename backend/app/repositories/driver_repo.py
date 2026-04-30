@@ -1,9 +1,10 @@
 import uuid
+from typing import Sequence
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.driver import Driver
+from app.models.driver import AvailabilityStatus, Driver
 
 
 class DriverRepository:
@@ -18,6 +19,24 @@ class DriverRepository:
         result = await self.db.execute(select(Driver).where(Driver.id == driver_id))
         return result.scalar_one_or_none()
 
+    async def list_available(self) -> Sequence[Driver]:
+        """Return drivers who are available or actively seeking employment."""
+        result = await self.db.execute(
+            select(Driver).where(
+                or_(
+                    Driver.availability_status == AvailabilityStatus.available,
+                    Driver.seeking_employment == True,  # noqa: E712
+                )
+            )
+        )
+        return result.scalars().all()
+
+    async def list_by_employer(self, employer_user_id: uuid.UUID) -> Sequence[Driver]:
+        result = await self.db.execute(
+            select(Driver).where(Driver.employer_id == employer_user_id)
+        )
+        return result.scalars().all()
+
     async def create(self, **kwargs) -> Driver:
         driver = Driver(**kwargs)
         self.db.add(driver)
@@ -27,8 +46,7 @@ class DriverRepository:
 
     async def update(self, driver: Driver, **kwargs) -> Driver:
         for key, value in kwargs.items():
-            if value is not None:
-                setattr(driver, key, value)
+            setattr(driver, key, value)
         await self.db.flush()
         await self.db.refresh(driver)
         return driver

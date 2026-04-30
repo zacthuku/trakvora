@@ -16,6 +16,15 @@ class Settings(BaseSettings):
     africastalking_api_key: str = ""
     africastalking_username: str = "sandbox"
 
+    google_client_id: str = ""
+
+    smtp_host: str = "smtp.gmail.com"
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""
+    smtp_from_email: str = "noreply@trakvora.com"
+    smtp_tls: bool = True
+
     @property
     def cors_origins_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",")]

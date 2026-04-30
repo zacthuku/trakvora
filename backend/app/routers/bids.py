@@ -9,7 +9,7 @@ from app.models.user import User, UserRole
 from app.schemas.bid import BidCreate, BidOut
 from app.services import bid_service
 
-router = APIRouter(prefix="/bids", tags=["bids"])
+router = APIRouter(tags=["bids"])
 
 
 @router.post("", response_model=BidOut, status_code=201)

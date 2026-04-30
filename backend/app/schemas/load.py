@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.models.load import BookingMode, CargoType, LoadStatus
 
@@ -22,6 +22,9 @@ class LoadCreate(BaseModel):
     price_kes: float = Field(..., gt=0)
     booking_mode: BookingMode = BookingMode.fixed
     min_bid_floor_kes: float | None = None
+    distance_km: float | None = None
+    pickup_date: str | None = None
+    pickup_window: str | None = None
     pickup_deadline: str | None = None
     special_instructions: str | None = None
     requires_insurance: bool = False
@@ -56,10 +59,18 @@ class LoadOut(BaseModel):
     booking_mode: BookingMode
     min_bid_floor_kes: float | None
     status: LoadStatus
+    distance_km: float | None
+    pickup_date: str | None
+    pickup_window: str | None
     pickup_deadline: str | None
     special_instructions: str | None
-    requires_insurance: bool
+    requires_insurance: bool = False
     created_at: datetime
+
+    @field_validator("requires_insurance", mode="before")
+    @classmethod
+    def coerce_none_to_false(cls, v):
+        return bool(v) if v is not None else False
 
 
 class LoadListOut(BaseModel):

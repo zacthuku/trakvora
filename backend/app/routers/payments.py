@@ -7,7 +7,7 @@ from app.models.user import User
 from app.schemas.wallet import TransactionListOut, WalletOut
 from app.services import payment_service
 
-router = APIRouter(prefix="/payments", tags=["payments"])
+router = APIRouter(tags=["payments"])
 
 
 @router.get("/wallet", response_model=WalletOut)

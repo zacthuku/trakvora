@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 62 74" fill="none">
+  <!-- Location pin -->
+  <path d="M31 67 C31 67 15 50 15 37 A16 16 0 0 1 47 37 C47 50 31 67 31 67 Z"
+        fill="white" stroke="#041627" stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="31" cy="37" r="6.5" fill="#fe6a34"/>
+  <ellipse cx="31" cy="69.5" rx="7.5" ry="3" fill="#4fdbcc"/>
+  <!-- Truck cargo box -->
+  <rect x="10" y="12" width="23" height="20" rx="1.5" fill="white" stroke="#041627" stroke-width="2"/>
+  <!-- Truck cab -->
+  <path d="M33 12 L33 32 L49 32 L49 21 L43 12 Z"
+        fill="white" stroke="#041627" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M33 12 L43 12 L48 18 L33 18 Z" fill="#4fdbcc" stroke="#041627" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M35 19 L43 19 L47 25 L35 25 Z" fill="#b2eee8" opacity="0.7"/>
+  <!-- Chassis -->
+  <rect x="11" y="31" width="37" height="2.5" rx="1" fill="#041627"/>
+  <!-- Wheels -->
+  <circle cx="20" cy="36" r="5.5" fill="#041627"/>
+  <circle cx="20" cy="36" r="2.5" fill="white"/>
+  <circle cx="39" cy="36" r="5.5" fill="#041627"/>
+  <circle cx="39" cy="36" r="2.5" fill="white"/>
+</svg>

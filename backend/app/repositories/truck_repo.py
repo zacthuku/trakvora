@@ -1,4 +1,5 @@
 import uuid
+from typing import Sequence
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,11 +15,17 @@ class TruckRepository:
         result = await self.db.execute(select(Truck).where(Truck.id == truck_id))
         return result.scalar_one_or_none()
 
-    async def list_by_owner(self, owner_id: uuid.UUID) -> list[Truck]:
+    async def list_by_owner(self, owner_id: uuid.UUID) -> Sequence[Truck]:
         result = await self.db.execute(
             select(Truck).where(Truck.owner_id == owner_id).order_by(Truck.created_at.desc())
         )
         return result.scalars().all()
+
+    async def get_by_assigned_driver(self, driver_id: uuid.UUID) -> Truck | None:
+        result = await self.db.execute(
+            select(Truck).where(Truck.assigned_driver_id == driver_id)
+        )
+        return result.scalar_one_or_none()
 
     async def create(self, **kwargs) -> Truck:
         truck = Truck(**kwargs)
@@ -29,8 +36,7 @@ class TruckRepository:
 
     async def update(self, truck: Truck, **kwargs) -> Truck:
         for key, value in kwargs.items():
-            if value is not None:
-                setattr(truck, key, value)
+            setattr(truck, key, value)
         await self.db.flush()
         await self.db.refresh(truck)
         return truck
