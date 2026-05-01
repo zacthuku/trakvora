@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -24,6 +25,11 @@ class Settings(BaseSettings):
     smtp_password: str = ""
     smtp_from_email: str = "noreply@trakvora.com"
     smtp_tls: bool = True
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def strip_database_url(cls, v: str) -> str:
+        return str(v).strip()
 
     @property
     def cors_origins_list(self) -> list[str]:
