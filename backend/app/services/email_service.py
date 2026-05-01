@@ -13,6 +13,10 @@ FROM_SUPPORT = "support@trakvora.com"
 FROM_BILLING = "billing@trakvora.com"
 
 
+def _get_default_from_email() -> str:
+    return settings.smtp_from_email or settings.smtp_username or FROM_NO_REPLY
+
+
 def _send_smtp(to: str, subject: str, html: str, from_email: str = FROM_NO_REPLY) -> None:
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
@@ -24,7 +28,12 @@ def _send_smtp(to: str, subject: str, html: str, from_email: str = FROM_NO_REPLY
             server.starttls()
         if settings.smtp_username:
             server.login(settings.smtp_username, settings.smtp_password)
-        server.sendmail(settings.smtp_username or from_email, [to], msg.as_string())
+        envelope_sender = settings.smtp_username or from_email
+        if settings.smtp_from_email and settings.smtp_username and settings.smtp_from_email != settings.smtp_username:
+            logger.warning(
+                "SMTP auth username differs from from-email; delivery may be rejected by the provider."
+            )
+        server.sendmail(envelope_sender, [to], msg.as_string())
 
 
 def _otp_html(name: str, code: str, purpose: str = "sign in") -> str:
@@ -46,12 +55,16 @@ def _otp_html(name: str, code: str, purpose: str = "sign in") -> str:
 async def send_otp_email(to: str, code: str, name: str = "there", purpose: str = "sign in") -> None:
     logger.info(f"[OTP] {to} → {code}")
 
-    if not settings.smtp_username:
+    if not settings.smtp_username or not settings.smtp_host:
+        logger.warning("SMTP is not configured; skipping OTP email delivery.")
         return
 
     try:
         html = _otp_html(name, code, purpose)
-        await asyncio.to_thread(_send_smtp, to, "trakvora — Your verification code", html, FROM_NO_REPLY)
+        await asyncio.to_thread(
+            _send_smtp, to, "trakvora — Your verification code", html, _get_default_from_email()
+        )
+        logger.info(f"Sent OTP email to {to}")
     except Exception as exc:
         logger.error(f"Failed to send OTP email to {to}: {exc}")
 
@@ -88,13 +101,15 @@ def _welcome_html(name: str, role: str) -> str:
 async def send_welcome_email(to: str, name: str, role: str) -> None:
     logger.info(f"[Welcome] {to} role={role}")
 
-    if not settings.smtp_username:
+    if not settings.smtp_username or not settings.smtp_host:
+        logger.warning("SMTP is not configured; skipping welcome email delivery.")
         return
 
     try:
         html = _welcome_html(name, role)
         await asyncio.to_thread(
-            _send_smtp, to, f"Welcome to trakvora, {name.split()[0]}!", html, FROM_NO_REPLY
+            _send_smtp, to, f"Welcome to trakvora, {name.split()[0]}!", html, _get_default_from_email()
         )
+        logger.info(f"Sent welcome email to {to}")
     except Exception as exc:
         logger.error(f"Failed to send welcome email to {to}: {exc}")
