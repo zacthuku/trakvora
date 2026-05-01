@@ -31,6 +31,13 @@ export const driverApi = {
   getDriverById: (driverId) =>
     apiClient.get(`/drivers/${driverId}`).then((r) => r.data),
 
+  // Direct offer response
+  respondToOffer: (loadId, accept, notificationId) =>
+    apiClient.post(`/loads/${loadId}/offer-response`, {
+      accept,
+      notification_id: notificationId ?? null,
+    }).then((r) => r.data),
+
   // Trucks
   getMyTrucks: () => apiClient.get("/trucks").then((r) => r.data),
   getAssignedTruck: () => apiClient.get("/trucks/assigned-to-me").then((r) => r.data),

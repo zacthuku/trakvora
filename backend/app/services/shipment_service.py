@@ -18,6 +18,15 @@ _VALID_TRANSITIONS = {
 }
 
 
+async def get_by_load_id(load_id: uuid.UUID, current_user: User, db: AsyncSession) -> ShipmentOut:
+    repo = ShipmentRepository(db)
+    shipment = await repo.get_by_load(load_id)
+    if not shipment:
+        raise ShipmentNotFound()
+    _assert_access(shipment, current_user)
+    return ShipmentOut.model_validate(shipment)
+
+
 async def get_shipment(shipment_id: uuid.UUID, current_user: User, db: AsyncSession) -> ShipmentOut:
     repo = ShipmentRepository(db)
     shipment = await repo.get_by_id(shipment_id)

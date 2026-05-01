@@ -39,6 +39,14 @@ export default function DriverSettingsPage() {
   const navigate = useNavigate();
   const { enabled, setEnabled } = useNotificationStore();
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteText, setDeleteText] = useState("");
+
+  const deleteMutation = useMutation({
+    mutationFn: () => apiClient.delete("/users/me"),
+    onSuccess: () => { clearAuth(); navigate("/login"); },
+  });
+
   const [profile, setProfile] = useState({
     full_name: user?.full_name || "",
     phone: user?.phone || "",
@@ -83,10 +91,50 @@ export default function DriverSettingsPage() {
 
   return (
     <div className="w-full max-w-2xl">
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mb-4 mx-auto">
+              <Trash2 className="w-6 h-6 text-red-500" />
+            </div>
+            <h3 className="text-lg font-heading font-bold text-slate-900 text-center mb-2">Delete Account</h3>
+            <p className="text-sm text-slate-500 text-center mb-5">
+              This permanently deletes your driver account and all associated data. Cannot be undone.
+            </p>
+            <p className="text-xs font-semibold text-slate-700 mb-2 uppercase tracking-wider">
+              Type <span className="text-red-600 font-mono">DELETE</span> to confirm
+            </p>
+            <input value={deleteText} onChange={(e) => setDeleteText(e.target.value)} placeholder="DELETE"
+              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm mb-4 focus:outline-none focus:border-red-400" />
+            <div className="flex gap-3">
+              <button onClick={() => { setShowDeleteModal(false); setDeleteText(""); }}
+                className="flex-1 px-4 py-2.5 border border-slate-200 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50">
+                Cancel
+              </button>
+              <button onClick={() => deleteMutation.mutate()}
+                disabled={deleteText !== "DELETE" || deleteMutation.isPending}
+                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 disabled:opacity-50">
+                {deleteMutation.isPending ? "Deleting…" : "Delete Account"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mb-7">
         <h1 className="text-2xl font-heading font-bold text-slate-900 tracking-tight">Settings</h1>
         <p className="text-slate-500 text-sm mt-1">Manage your driver profile and notification preferences.</p>
       </div>
+
+      {!user?.phone && (
+        <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl mb-5">
+          <Phone className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-amber-800">Add your phone number</p>
+            <p className="text-xs text-amber-600 mt-0.5">Required for SMS alerts and two-factor authentication. Update it in your profile below.</p>
+          </div>
+        </div>
+      )}
 
       {/* Profile */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-5">
@@ -202,18 +250,40 @@ export default function DriverSettingsPage() {
 
       {/* Danger zone */}
       <div className="bg-white rounded-xl border border-red-200 shadow-sm px-6 py-5">
-        <h2 className="font-heading font-semibold text-slate-900 mb-4 flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-red-500" /> Danger Zone
-        </h2>
-        <div className="flex items-center justify-between py-3 border border-slate-100 rounded-lg px-4">
-          <div>
-            <p className="text-sm font-semibold text-slate-800">Sign Out</p>
-            <p className="text-xs text-slate-400 mt-0.5">Sign out on this device.</p>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center">
+            <AlertCircle className="w-4 h-4 text-red-500" />
           </div>
-          <button onClick={() => { clearAuth(); navigate("/login"); }}
-            className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
-            Sign Out
-          </button>
+          <div>
+            <h2 className="font-heading font-semibold text-slate-900">Danger Zone</h2>
+            <p className="text-xs text-slate-500 mt-0.5">Irreversible account actions.</p>
+          </div>
+        </div>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between py-3 border border-slate-100 rounded-lg px-4">
+            <div>
+              <p className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                <LogOut className="w-4 h-4 text-slate-500" /> Sign Out
+              </p>
+              <p className="text-xs text-slate-400 mt-0.5">Sign out on this device.</p>
+            </div>
+            <button onClick={() => { clearAuth(); navigate("/login"); }}
+              className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+              Sign Out
+            </button>
+          </div>
+          <div className="flex items-center justify-between py-3 border border-red-100 rounded-lg px-4 bg-red-50/30">
+            <div>
+              <p className="text-sm font-semibold text-red-700 flex items-center gap-2">
+                <Trash2 className="w-4 h-4" /> Delete Account
+              </p>
+              <p className="text-xs text-red-400 mt-0.5">Permanently deletes all data. Cannot be undone.</p>
+            </div>
+            <button onClick={() => setShowDeleteModal(true)}
+              className="px-4 py-2 border border-red-200 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors">
+              Delete
+            </button>
+          </div>
         </div>
       </div>
     </div>

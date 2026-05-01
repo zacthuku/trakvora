@@ -22,6 +22,7 @@ class LoadStatus(str, enum.Enum):
 class BookingMode(str, enum.Enum):
     fixed = "fixed"
     auction = "auction"
+    direct = "direct"
 
 
 class CargoType(str, enum.Enum):
@@ -61,5 +62,7 @@ class Load(Base):
     pickup_deadline: Mapped[str | None] = mapped_column(String(50))
     special_instructions: Mapped[str | None] = mapped_column(Text)
     requires_insurance: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false", nullable=False)
+    direct_offer_user_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
 
     shipper = relationship("User", foreign_keys=[shipper_id])
+    direct_offer_user = relationship("User", foreign_keys=[direct_offer_user_id])

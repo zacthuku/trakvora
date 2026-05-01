@@ -21,6 +21,8 @@ class NotificationType(str, enum.Enum):
     dispute_opened = "dispute_opened"
     dispute_resolved = "dispute_resolved"
     consignment_signed = "consignment_signed"
+    direct_offer = "direct_offer"
+    direct_offer_response = "direct_offer_response"
     system = "system"
 
 

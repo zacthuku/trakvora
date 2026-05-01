@@ -5,10 +5,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ForbiddenError, LoadNotFound
 from app.core.utils import detect_corridor
-from app.models.load import LoadStatus
+from app.models.load import BookingMode, LoadStatus
+from app.models.notification import NotificationType
 from app.models.user import User
 from app.repositories.load_repo import LoadRepository
 from app.schemas.load import LoadCreate, LoadOut, LoadUpdate
+from app.services import notification_service
 
 
 async def create_load(payload: LoadCreate, current_user: User, db: AsyncSession) -> LoadOut:
@@ -24,6 +26,19 @@ async def create_load(payload: LoadCreate, current_user: User, db: AsyncSession)
         corridor=corridor,
         **payload.model_dump(),
     )
+
+    if payload.booking_mode == BookingMode.direct and payload.direct_offer_user_id:
+        route = f"{payload.pickup_location.split(',')[0]} → {payload.dropoff_location.split(',')[0]}"
+        await notification_service.send_notification(
+            user_id=payload.direct_offer_user_id,
+            notification_type=NotificationType.direct_offer,
+            title="Direct Load Offer",
+            body=f"{current_user.full_name} is offering you a direct load: {route}. KES {int(payload.price_kes):,}",
+            reference_id=load.id,
+            reference_type="load",
+            db=db,
+        )
+
     return LoadOut.model_validate(load)
 
 

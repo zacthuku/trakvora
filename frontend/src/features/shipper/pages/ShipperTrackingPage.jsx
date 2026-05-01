@@ -136,10 +136,10 @@ function ShipmentTrackCard({ load }) {
             <Eye className="w-3.5 h-3.5" /> View Bids
           </Link>
           {TRACKABLE_STATUSES.includes(load.status) && (
-            <Link to={`/shipper/bids/${load.id}`}
+            <Link to={`/shipper/track/${load.id}`}
               className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-secondary text-white rounded-lg text-[11px] font-semibold hover:opacity-90 transition-opacity">
               <Navigation2 className="w-3.5 h-3.5" />
-              {load.status === "in_transit" ? "Live Track" : "Details"}
+              {load.status === "in_transit" ? "Live Track" : "Track Status"}
             </Link>
           )}
         </div>

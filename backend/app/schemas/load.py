@@ -28,6 +28,7 @@ class LoadCreate(BaseModel):
     pickup_deadline: str | None = None
     special_instructions: str | None = None
     requires_insurance: bool = False
+    direct_offer_user_id: uuid.UUID | None = None
 
 
 class LoadUpdate(BaseModel):
@@ -65,6 +66,7 @@ class LoadOut(BaseModel):
     pickup_deadline: str | None
     special_instructions: str | None
     requires_insurance: bool = False
+    direct_offer_user_id: uuid.UUID | None = None
     created_at: datetime
 
     @field_validator("requires_insurance", mode="before")

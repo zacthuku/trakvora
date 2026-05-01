@@ -141,7 +141,11 @@ async def verify_otp(email: str, code: str, db: AsyncSession) -> TokenResponse:
     if not user:
         raise UnauthorizedError("User not found")
 
+    first_verify = not user.is_verified
     await user_repo.update(user, is_verified=True)
+
+    if first_verify:
+        await email_service.send_welcome_email(user.email, user.full_name, user.role.value)
 
     return TokenResponse(
         access_token=create_access_token(str(user.id), user.role),
@@ -164,7 +168,7 @@ async def google_auth(
     access_token: str,
     role: UserRole | None,
     db: AsyncSession,
-) -> TokenResponse | GoogleNewUserResponse:
+) -> OTPRequiredResponse | GoogleNewUserResponse:
     async with httpx.AsyncClient() as client:
         resp = await client.get(
             "https://www.googleapis.com/oauth2/v1/userinfo",
@@ -202,13 +206,19 @@ async def google_auth(
         wallet_repo = WalletRepository(db)
         await wallet_repo.create_wallet(user.id)
         await db.commit()
+        await email_service.send_welcome_email(user.email, user.full_name, user.role.value)
 
     if not user.is_active:
         raise UnauthorizedError("Account is disabled")
 
-    return TokenResponse(
-        access_token=create_access_token(str(user.id), user.role),
-        refresh_token=create_refresh_token(str(user.id)),
+    otp_repo = OTPRepository(db)
+    code = await otp_repo.create(user.email)
+    await email_service.send_otp_email(user.email, code, user.full_name, purpose="sign in with Google")
+
+    return OTPRequiredResponse(
+        email=user.email,
+        channel="email",
+        destination=_mask_email(user.email),
     )
 
 

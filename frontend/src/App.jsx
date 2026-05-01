@@ -28,6 +28,7 @@ import LoginPage from "@/features/auth/pages/LoginPage";
 import RegisterPage from "@/features/auth/pages/RegisterPage";
 
 import ShipperDashboard from "@/features/shipper/pages/ShipperDashboard";
+import ShipperLoadTrackingPage from "@/features/shipper/pages/ShipperLoadTrackingPage";
 import ShipperTrackingPage from "@/features/shipper/pages/ShipperTrackingPage";
 import ShipperSupportPage from "@/features/shipper/pages/ShipperSupportPage";
 import ShipperSettingsPage from "@/features/shipper/pages/ShipperSettingsPage";
@@ -109,6 +110,7 @@ export default function App() {
         <Route path="bids/:loadId" element={<BidComparisonPage />} />
         <Route path="tracking" element={<ShipperTrackingPage />} />
         <Route path="history" element={<ShipmentHistoryPage />} />
+        <Route path="track/:loadId" element={<ShipperLoadTrackingPage />} />
         <Route path="support" element={<ShipperSupportPage />} />
         <Route path="settings" element={<ShipperSettingsPage />} />
         <Route path="wallet" element={<WalletPage />} />

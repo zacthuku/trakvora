@@ -12,6 +12,15 @@ from app.services import shipment_service
 router = APIRouter(tags=["shipments"])
 
 
+@router.get("/by-load/{load_id}", response_model=ShipmentOut)
+async def get_shipment_by_load(
+    load_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    return await shipment_service.get_by_load_id(load_id, current_user, db)
+
+
 @router.get("/{shipment_id}", response_model=ShipmentOut)
 async def get_shipment(
     shipment_id: uuid.UUID,

@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -192,6 +192,35 @@ async def list_available_drivers(
     repo = DriverRepository(db)
     drivers = await repo.list_available()
     return drivers
+
+
+@router.get("/search-carriers", response_model=list[DriverWithUserOut])
+async def search_carriers_for_offer(
+    q: str | None = Query(None, description="Search by name or location"),
+    _: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Search available drivers that shippers can send direct load offers to."""
+    stmt = (
+        select(Driver)
+        .options(selectinload(Driver.user))
+        .where(
+            or_(
+                Driver.availability_status == AvailabilityStatus.available,
+                Driver.seeking_employment == True,  # noqa: E712
+            )
+        )
+    )
+    result = await db.execute(stmt)
+    drivers = result.scalars().all()
+    if q:
+        q_lower = q.lower()
+        drivers = [
+            d for d in drivers
+            if q_lower in (d.user.full_name or "").lower()
+            or q_lower in (d.availability_location or "").lower()
+        ]
+    return [_driver_with_user(d) for d in drivers]
 
 
 @router.get("/by-user/{user_id}", response_model=DriverPublicOut)
