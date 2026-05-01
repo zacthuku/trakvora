@@ -15,7 +15,7 @@ if config.config_file_name is not None:
 
 target_metadata = Base.metadata
 
-database_url = os.getenv("DATABASE_URL", "postgresql+asyncpg://trakvora:trakvora@localhost:5432/trakvora")
+database_url = os.getenv("DATABASE_URL", "postgresql+asyncpg://trakvora:trakvora@localhost:5432/trakvora").strip()
 
 
 def run_migrations_offline() -> None:
